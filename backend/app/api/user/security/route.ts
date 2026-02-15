@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    return successResponse('Security settings retrieved', settings);
+    return successResponse(settings, 'Security settings retrieved');
   } catch (error) {
     console.error('Get security settings error:', error);
     return errorResponse('Failed to get security settings');
@@ -46,7 +46,7 @@ export async function PUT(request: NextRequest) {
       },
     });
 
-    return successResponse('Security settings updated', settings);
+    return successResponse(settings, 'Security settings updated');
   } catch (error) {
     console.error('Update security settings error:', error);
     return errorResponse('Failed to update security settings');

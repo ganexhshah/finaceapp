@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
     });
 
-    return successResponse('Active sessions retrieved', sessions);
+    return successResponse(sessions, 'Active sessions retrieved');
   } catch (error) {
     console.error('Get sessions error:', error);
     return errorResponse('Failed to get sessions');

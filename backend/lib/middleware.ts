@@ -11,3 +11,13 @@ export function requireAuth(request: NextRequest) {
   
   return { error: null, user };
 }
+
+export async function authenticateToken(request: NextRequest) {
+  const user = getUserFromRequest(request);
+  
+  if (!user) {
+    return { success: false, userId: null, message: 'Authentication required' };
+  }
+  
+  return { success: true, userId: user.id, message: 'Authenticated' };
+}

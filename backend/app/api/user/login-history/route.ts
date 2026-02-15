@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
       take: 50,
     });
 
-    return successResponse('Login history retrieved', history);
+    return successResponse(history, 'Login history retrieved');
   } catch (error) {
     console.error('Get login history error:', error);
     return errorResponse('Failed to get login history');

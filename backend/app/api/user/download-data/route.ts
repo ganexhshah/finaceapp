@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
       exportedAt: new Date().toISOString(),
     };
 
-    return successResponse('Data exported successfully', data);
+    return successResponse(data, 'Data exported successfully');
   } catch (error) {
     console.error('Download data error:', error);
     return errorResponse('Failed to export data');
