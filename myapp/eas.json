@@ -17,7 +17,7 @@
         "gradleCommand": ":app:assembleRelease"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://your-backend-url.com"
+        "EXPO_PUBLIC_API_URL": "https://api.itaharihub.xyz"
       }
     },
     "production": {
