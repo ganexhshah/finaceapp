@@ -70,9 +70,14 @@ export async function POST(request: NextRequest) {
 
     const income = await prisma.income.create({
       data: {
-        ...data,
+        amount: data.amount,
+        title: data.title,
         date: new Date(data.date),
         userId: user.userId,
+        categoryId: data.categoryId,
+        accountId: data.accountId,
+        notes: data.notes,
+        isRecurring: data.isRecurring,
       },
       include: {
         category: true,
