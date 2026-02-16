@@ -5,7 +5,7 @@ import { requireAuth } from '@/lib/middleware';
 import { successResponse, errorResponse, validationErrorResponse } from '@/lib/response';
 
 const incomeSchema = z.object({
-  categoryId: z.string(),
+  categoryId: z.string().optional(),
   accountId: z.string().optional(),
   title: z.string().min(1, 'Title is required'),
   amount: z.number().positive('Amount must be positive'),

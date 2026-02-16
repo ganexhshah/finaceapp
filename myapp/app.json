@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "myapp",
-    "slug": "myapp",
+    "name": "Finance Manager",
+    "slug": "finance-manager",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -15,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.myapp"
+      "bundleIdentifier": "com.financemanager.app"
     },
     "android": {
       "adaptiveIcon": {
@@ -23,7 +23,14 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.myapp"
+      "package": "com.financemanager.app",
+      "versionCode": 1,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -33,9 +40,9 @@
     "plugins": [
       "expo-router",
       [
-        "expo-splash-screen",
+        "expo-image-picker",
         {
-          "imageWidth": 200
+          "photosPermission": "Allow Finance Manager to access your photos to upload bills and receipts."
         }
       ]
     ],
@@ -45,6 +52,12 @@
     "updates": {
       "enabled": false,
       "fallbackToCacheTimeout": 0
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "f1e2b24a-ee78-4a03-a719-bb12d9dd703f"
+      }
     }
   }
 }

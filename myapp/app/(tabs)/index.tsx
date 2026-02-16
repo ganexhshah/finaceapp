@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Header from '@/components/header';
 import BalanceCard from '@/components/balance-card';
+import CalendarView from '@/components/calendar-view';
 import { CURRENCY_SYMBOL } from '@/constants/currency';
 import api from '@/lib/api';
 import { SkeletonBalanceCard, SkeletonTransactionList, SkeletonCard } from '@/components/skeleton';
@@ -19,6 +20,12 @@ export default function DashboardScreen() {
   const [totalBalance, setTotalBalance] = useState(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  
+  // Calendar selected date state
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDayIncome, setSelectedDayIncome] = useState(0);
+  const [selectedDayExpense, setSelectedDayExpense] = useState(0);
+  const [selectedDayTransactions, setSelectedDayTransactions] = useState<any[]>([]);
 
   const loadDashboardData = useCallback(async () => {
     try {
@@ -76,7 +83,8 @@ export default function DashboardScreen() {
 
       if (partiesRes.success && partiesRes.data) {
         // Backend returns { parties: [], summary: {} }
-        const partiesData = partiesRes.data.parties || partiesRes.data;
+        const data = partiesRes.data as any;
+        const partiesData = data.parties || data;
         setParties(Array.isArray(partiesData) ? partiesData : []);
       }
 
@@ -101,6 +109,13 @@ export default function DashboardScreen() {
     await loadDashboardData();
     setRefreshing(false);
   }, [loadDashboardData]);
+
+  const handleDateSelect = (date: Date, income: number, expense: number, transactions: any[]) => {
+    setSelectedDate(date);
+    setSelectedDayIncome(income);
+    setSelectedDayExpense(expense);
+    setSelectedDayTransactions(transactions);
+  };
 
   const totalReceive = parties.filter((p: any) => p.type === 'receive').reduce((sum: number, p: any) => sum + (p.balance || 0), 0);
   const totalGive = parties.filter((p: any) => p.type === 'give').reduce((sum: number, p: any) => sum + (p.balance || 0), 0);
@@ -189,6 +204,99 @@ export default function DashboardScreen() {
             <Text style={styles.actionText}>Set Budget</Text>
           </TouchableOpacity>
         </View>
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Calendar</Text>
+          </View>
+          <CalendarView onDateSelect={handleDateSelect} />
+        </View>
+
+        {/* Selected Day Details */}
+        {selectedDate && (
+          <View style={styles.section}>
+            <View style={styles.selectedDateHeader}>
+              <Text style={styles.selectedDateTitle}>
+                {selectedDate.toLocaleDateString('en-US', { 
+                  weekday: 'long', 
+                  month: 'long', 
+                  day: 'numeric',
+                  year: 'numeric'
+                })}
+              </Text>
+              <Text style={styles.selectedDateSubtitle}>
+                Transactions for this day
+              </Text>
+            </View>
+
+            {/* Income/Expense Summary Cards */}
+            <View style={styles.summaryCards}>
+              <View style={styles.summaryCard}>
+                <View style={styles.summaryCardHeader}>
+                  <View style={[styles.summaryCardIconWrapper, styles.incomeIconWrapper]}>
+                    <Ionicons name="trending-up" size={20} color="#10b981" />
+                  </View>
+                  <Text style={styles.summaryCardLabel}>Income</Text>
+                </View>
+                <Text style={[styles.summaryCardAmount, styles.incomeAmount]}>
+                  {CURRENCY_SYMBOL}{selectedDayIncome.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                </Text>
+              </View>
+
+              <View style={styles.summaryCard}>
+                <View style={styles.summaryCardHeader}>
+                  <View style={[styles.summaryCardIconWrapper, styles.expenseIconWrapper]}>
+                    <Ionicons name="trending-down" size={20} color="#ef4444" />
+                  </View>
+                  <Text style={styles.summaryCardLabel}>Expense</Text>
+                </View>
+                <Text style={[styles.summaryCardAmount, styles.expenseAmount]}>
+                  {CURRENCY_SYMBOL}{selectedDayExpense.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                </Text>
+              </View>
+            </View>
+
+            {/* Transactions List */}
+            {selectedDayTransactions.length > 0 ? (
+              <View style={styles.dayTransactionsList}>
+                <Text style={styles.dayTransactionsTitle}>Transactions</Text>
+                {selectedDayTransactions.map((transaction) => (
+                  <View key={transaction.id} style={styles.dayTransactionItem}>
+                    <View style={[
+                      styles.dayTransactionIcon,
+                      transaction.type === 'income' ? styles.incomeIcon : styles.expenseIcon
+                    ]}>
+                      <Ionicons 
+                        name={transaction.category?.icon as any || (transaction.type === 'income' ? 'wallet' : 'cart')} 
+                        size={20} 
+                        color={transaction.type === 'income' ? '#10b981' : '#ef4444'} 
+                      />
+                    </View>
+
+                    <View style={styles.dayTransactionDetails}>
+                      <Text style={styles.dayTransactionTitle}>{transaction.title}</Text>
+                      {transaction.category && (
+                        <Text style={styles.dayTransactionCategory}>{transaction.category.name}</Text>
+                      )}
+                    </View>
+
+                    <Text style={[
+                      styles.dayTransactionAmount,
+                      transaction.type === 'income' ? styles.incomeAmount : styles.expenseAmount
+                    ]}>
+                      {transaction.type === 'income' ? '+' : '-'}{CURRENCY_SYMBOL}{transaction.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            ) : (
+              <View style={styles.emptyDayState}>
+                <Ionicons name="calendar-outline" size={48} color="#d1d5db" />
+                <Text style={styles.emptyText}>No transactions on this day</Text>
+              </View>
+            )}
+          </View>
+        )}
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -359,10 +467,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   incomeIcon: {
-    backgroundColor: '#d1fae5',
+    backgroundColor: '#f0fdf4',
   },
   expenseIcon: {
-    backgroundColor: '#fee2e2',
+    backgroundColor: '#fef2f2',
   },
   budgetIcon: {
     backgroundColor: '#fef3c7',
@@ -549,5 +657,132 @@ const styles = StyleSheet.create({
   },
   bottomSpacing: {
     height: 100,
+  },
+  selectedDateHeader: {
+    marginBottom: 12,
+  },
+  selectedDateTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#374151',
+    marginBottom: 2,
+    fontFamily: Platform.select({ web: 'Google Sans, sans-serif', default: 'System' }),
+  },
+  selectedDateSubtitle: {
+    fontSize: 12,
+    color: '#9ca3af',
+    fontFamily: Platform.select({ web: 'Google Sans, sans-serif', default: 'System' }),
+  },
+  summaryCards: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 16,
+  },
+  summaryCard: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  summaryCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  summaryCardIconWrapper: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  incomeIconWrapper: {
+    backgroundColor: '#f0fdf4',
+  },
+  expenseIconWrapper: {
+    backgroundColor: '#fef2f2',
+  },
+  summaryCardLabel: {
+    fontSize: 13,
+    color: '#6b7280',
+    fontWeight: '500',
+    fontFamily: Platform.select({ web: 'Google Sans, sans-serif', default: 'System' }),
+  },
+  summaryCardAmount: {
+    fontSize: 22,
+    fontWeight: '700',
+    fontFamily: Platform.select({ web: 'Google Sans, sans-serif', default: 'System' }),
+  },
+  dayTransactionsList: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  dayTransactionsTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#374151',
+    marginBottom: 8,
+    paddingHorizontal: 4,
+    fontFamily: Platform.select({ web: 'Google Sans, sans-serif', default: 'System' }),
+  },
+  dayTransactionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
+  },
+  dayTransactionIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  dayTransactionDetails: {
+    flex: 1,
+  },
+  dayTransactionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1f2937',
+    marginBottom: 2,
+    fontFamily: Platform.select({ web: 'Google Sans, sans-serif', default: 'System' }),
+  },
+  dayTransactionCategory: {
+    fontSize: 11,
+    color: '#9ca3af',
+    fontFamily: Platform.select({ web: 'Google Sans, sans-serif', default: 'System' }),
+  },
+  dayTransactionAmount: {
+    fontSize: 15,
+    fontWeight: '700',
+    fontFamily: Platform.select({ web: 'Google Sans, sans-serif', default: 'System' }),
+  },
+  emptyDayState: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 32,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
   },
 });

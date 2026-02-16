@@ -17,6 +17,13 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen 
+          name="chat" 
+          options={{ 
+            headerShown: false,
+            animation: 'none',
+          }} 
+        />
         <Stack.Screen name="income" options={{ headerShown: false }} />
         <Stack.Screen name="expense" options={{ headerShown: false }} />
         <Stack.Screen name="budget" options={{ headerShown: false }} />

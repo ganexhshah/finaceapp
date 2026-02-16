@@ -6,6 +6,7 @@ interface ApiResponse<T = any> {
   success: boolean;
   message: string;
   data?: T;
+  error?: string;
   errors?: any;
 }
 
@@ -47,12 +48,24 @@ class ApiClient {
       });
 
       const data = await response.json();
+      
+      // If response is not ok but we got JSON, include status info
+      if (!response.ok && data) {
+        return {
+          success: false,
+          message: data.message || `Request failed with status ${response.status}`,
+          error: data.error || data.message,
+          errors: data.errors,
+        };
+      }
+      
       return data;
     } catch (error) {
       console.error('API request error:', error);
       return {
         success: false,
         message: 'Network error. Please check your connection.',
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }

@@ -7,10 +7,23 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
 
+  // Hide navbar on these pages
+  const hideNavbarRoutes = [
+    '/login',
+    '/signup',
+    '/otp',
+  ];
+
+  const shouldHideNavbar = hideNavbarRoutes.some(route => pathname.includes(route));
+
+  if (shouldHideNavbar) {
+    return null;
+  }
+
   const navItems = [
     { name: 'Home', icon: 'home', route: '/(tabs)/' },
     { name: 'Transactions', icon: 'list', route: '/(tabs)/transactions' },
-    { name: 'Chat', icon: 'chatbubble-ellipses', route: '/(tabs)/add', isCenter: true },
+    { name: 'Chat', icon: 'chatbubble-ellipses', route: '/chat', isCenter: true },
     { name: 'Statistics', icon: 'stats-chart', route: '/(tabs)/statistics' },
     { name: 'Profile', icon: 'person', route: '/(tabs)/profile' },
   ];
