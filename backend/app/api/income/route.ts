@@ -68,16 +68,42 @@ export async function POST(request: NextRequest) {
 
     const data = validation.data;
 
+    // If no categoryId provided, find or create a default "Other" category
+    let categoryId = data.categoryId;
+    if (!categoryId) {
+      let defaultCategory = await prisma.category.findFirst({
+        where: {
+          userId: user.userId,
+          name: 'Other',
+          type: 'income',
+        },
+      });
+
+      if (!defaultCategory) {
+        defaultCategory = await prisma.category.create({
+          data: {
+            userId: user.userId,
+            name: 'Other',
+            icon: 'help-circle',
+            type: 'income',
+            isDefault: true,
+          },
+        });
+      }
+
+      categoryId = defaultCategory.id;
+    }
+
     const income = await prisma.income.create({
       data: {
         amount: data.amount,
         title: data.title,
         date: new Date(data.date),
         userId: user.userId,
-        categoryId: data.categoryId,
-        accountId: data.accountId,
-        notes: data.notes,
-        isRecurring: data.isRecurring,
+        categoryId: categoryId,
+        ...(data.accountId && { accountId: data.accountId }),
+        ...(data.notes && { notes: data.notes }),
+        ...(data.isRecurring !== undefined && { isRecurring: data.isRecurring }),
       },
       include: {
         category: true,
