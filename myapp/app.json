@@ -1,29 +1,28 @@
 {
   "expo": {
-    "name": "Finance Manager",
-    "slug": "finance-manager",
+    "name": "Bol Kharcha",
+    "slug": "bol-kharcha",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logo.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/splash-icon.png",
+      "image": "./assets/images/logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.financemanager.app"
+      "bundleIdentifier": "com.bolkharcha.app"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png",
+        "foregroundImage": "./assets/images/logo.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.financemanager.app",
+      "package": "com.bolkharcha.app",
       "versionCode": 1,
       "permissions": [
         "android.permission.CAMERA",
@@ -42,7 +41,7 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Allow Finance Manager to access your photos to upload bills and receipts."
+          "photosPermission": "Allow Bol Kharcha to access your photos to upload bills and receipts."
         }
       ]
     ],
